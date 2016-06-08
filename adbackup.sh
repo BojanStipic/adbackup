@@ -131,7 +131,7 @@ read -r ans
 # Do incremental backup
 if [[ $ans == y || $ans == Y || ! $ans ]]; then
 	IFS=$'\n'
-	cmd() { rsync -rlvh --delete --ignore-existing "$@" ;}
+	cmd() { rsync -avh --delete "$@" ;}
 	if [[ "$reverse" == true ]]; then
 		for dir in $skel; do
 			cmd "$dir/" "${dir/$backupPath/$devicePath}/"
