@@ -71,10 +71,11 @@ $ adbackup.sh /path/to/root/backup/directory
 ```
 
 ## Caveat:
-If doing reverse operation, permissions and timestamps cannot be preserved 
+If doing reverse operation, permissions and timestamps cannot be preserved
 on Android device over MTP because of a bug in FUSE implementation,
-so we must use `-rl --size-only` instead of `-a` rsync option.
+so we must use `-rl --size-only` instead of `-a` rsync option.  
 Last tested on Android Marshmallow, and still not fixed.
+See this [stackexchange answer](http://android.stackexchange.com/a/35911) for additional information.
 
 This means that your pictures will all have modification date set to
 current date, and may not be sorted correctly in your gallery app,
