@@ -132,13 +132,18 @@ read -r ans
 if [[ $ans == y || $ans == Y || ! $ans ]]; then
 	IFS=$'\n'
 	cmd() { rsync -avh --delete "$@" ;}
-	if [[ "$reverse" == true ]]; then
+	# If doing reverse operation, permissions and timestamps cannot be preserved 
+	# on Android device over MTP because of a bug in FUSE implementation,
+	# so we must use `-rl --size-only` instead of `-a` rsync option.
+	# Last tested on Android Marshmallow, and still not fixed.
+	cmd_r() { rsync -rlvh --size-only --delete "$@" ;}
+	if [[ "$reverse" != true ]]; then
 		for dir in $skel; do
-			cmd "$dir/" "${dir/$backupPath/$devicePath}/"
+			cmd "${dir/$backupPath/$devicePath}/" "$dir/"
 		done
 	else
 		for dir in $skel; do
-			cmd "${dir/$backupPath/$devicePath}/" "$dir/"
+			cmd_r "$dir/" "${dir/$backupPath/$devicePath}/"
 		done
 	fi
 	unset IFS
