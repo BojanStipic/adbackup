@@ -136,7 +136,7 @@ if [[ $ans == y || $ans == Y || ! $ans ]]; then
 	# on Android device over MTP because of a bug in FUSE implementation,
 	# so we must use `-rl --size-only` instead of `-a` rsync option.
 	# Last tested on Android Marshmallow, and still not fixed.
-	cmd_r() { rsync -rlvh --size-only --delete "$@" ;}
+	cmd_r() { rsync -rlvh --size-only "$@" ;}
 	if [[ "$reverse" != true ]]; then
 		for dir in $skel; do
 			cmd "${dir/$backupPath/$devicePath}/" "$dir/"
