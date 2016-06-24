@@ -37,28 +37,8 @@ OPTIONS:
 _EOF_
 }
 
-# Prints connected MTP devices
-printDevices()
-{
-	local ids idsIter i IFS bus device output
-	ids="$(find /run/user/$(id -u)/gvfs/ -maxdepth 1 -type d -name 'mtp:*')"\
-	i=0
-	IFS=$'\n'
-	if [[ "$ids" ]]; then
-		for idsIter in "$ids"; do
-			((++i))
-			bus=${idsIter#*%3A}
-			bus=${bus%\%2C*}
-			device=${idsIter#*%2C}
-			device=${device%\%5D*}
-			output="$i. $(lsusb | grep "Bus $bus Device $device" | cut -d' ' -f7-)"
-			echo "$output"
-		done
-	else
-		echo "No connected MTP devices found"
-	fi
-}
-
+# Prints device name
+# $1 - path to mounted directory
 deviceInfo()
 {
 	local bus device output
@@ -68,6 +48,23 @@ deviceInfo()
 	device=${device%\%5D*}
 	output="$(lsusb | grep "Bus $bus Device $device" | cut -d' ' -f7-)"
 	echo "$output"
+}
+
+# Prints all connected MTP devices
+printDevices()
+{
+	local ids idsIter i IFS
+	ids="$(find /run/user/$(id -u)/gvfs/ -maxdepth 1 -type d -name 'mtp:*')"
+	i=0
+	IFS=$'\n'
+	if [[ "$ids" ]]; then
+		for idsIter in "$ids"; do
+			((++i))
+			echo "$i. $(deviceInfo $idsIter)"
+		done
+	else
+		echo "No connected MTP devices found"
+	fi
 }
 
 # Defaults
