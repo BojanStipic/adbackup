@@ -111,7 +111,7 @@ devicePath="$(find /run/user/$(id -u)/gvfs/ -maxdepth 1 -type d -name 'mtp:*')"
 devicePathNum="$(echo $devicePath | wc -l | cut -d' ' -f1)"
 if [[ ! "$devicePath" ]]; then
 	echo "Error: No connected MTP device found."
-    exit 3
+	exit 3
 elif (( $deviceNum < 1 || $devicePathNum < $deviceNum )); then
 	echo "Error: Device with NUM=$deviceNum does not exist"
 	echo "Connected devices:"
