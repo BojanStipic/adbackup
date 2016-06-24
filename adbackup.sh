@@ -106,12 +106,22 @@ fi
 # Find leaf directories
 skel="$(find $backupPath -type d -exec sh -c '(ls -p "{}"|grep />/dev/null)||echo "{}"' \;)"
 
-devicePath="$(find /run/user/$(id -u)/gvfs/ -maxdepth 1 -type d -name 'mtp:*' | head -n$deviceNum | tail -n1)"
-
+# Select working device
+devicePath="$(find /run/user/$(id -u)/gvfs/ -maxdepth 1 -type d -name 'mtp:*')"
+devicePathNum="$(echo $devicePath | wc -l | cut -d' ' -f1)"
 if [[ ! "$devicePath" ]]; then
-	echo "Error: MTP device was not found."
+	echo "Error: No connected MTP device found."
     exit 3
+elif (( $deviceNum < 1 || $devicePathNum < $deviceNum )); then
+	echo "Error: Device with NUM=$deviceNum does not exist"
+	echo "Connected devices:"
+	printDevices
+	exit 3
+else
+	devicePath="$(echo $devicePath | head -n$deviceNum | tail -n1)"
 fi
+
+
 
 # Show summary and prompt user
 echo "Device:"
