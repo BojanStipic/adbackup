@@ -71,32 +71,47 @@ printDevices()
 backupPath="."
 deviceNum="1"
 
-# Parse arguments
-if (( $# > 0 )); then
-	isBackupPathSet=false
-	for arg in "$@"; do
-		if [[ "$arg" =~ ^[^-] && $isBackupPathSet == false ]]; then
-			backupPath="${arg%/}"
-			isBackupPathSet=true
-		elif [[ "$arg" =~ -d[0-9]+ || "$arg" =~ --device=[0-9]+ ]]; then
-			deviceNum="$arg"
-			deviceNum="${deviceNum#-d}"
-			deviceNum="${deviceNum#--device=}"
-		elif [[ "$arg" == -r || "$arg" == --reverse ]]; then
-			reverse=true
-		elif [[ "$arg" == -h || "$arg" == --help ]]; then
-			printUsage
-			exit
-		elif [[ "$arg" == -p || "$arg" == --print ]]; then
+args="$(getopt -o d:prh --long device:,print,reverse,help -n ${0##*/} -- "$@")"
+(( $? != 0 )) && exit 1
+eval set -- "$args"
+
+while true ; do
+	case "$1" in
+		-d|--device)
+			if [[ $2 =~ [0-9]+ ]]; then
+				deviceNum="$2"
+			else
+				echo "$1 requires an integer value."
+				printUsage
+				exit 1
+			fi
+			shift 2
+			;;
+		-p|--print)
 			printDevices
 			exit
-		else
-			echo "Unkown argument: $arg"
+			;;
+		-r|--reverse)
+			reverse=true
+			shift
+			;;
+		-h|--help)
+			printUsage
+			exit
+			;;
+		--)
+			shift
+			break
+			;;
+		*)
+			echo "Unkown argument: $1"
 			printUsage
 			exit 1
-	  	fi
-	done
-fi
+			;;
+	esac
+done
+(( $# > 1 )) && echo "Wrong number of positional arguments" && exit 1
+(( $# == 1)) && backupPath="${1%/}"
 
 if [[ ! -d "$backupPath" ]]; then
 	echo "Error: '$backupPath' does not exist, or is not a directory."
@@ -139,7 +154,7 @@ read -r ans
 if [[ $ans == y || $ans == Y || ! $ans ]]; then
 	IFS=$'\n'
 	cmd() { rsync -avh --delete "$@" ;}
-	# If doing reverse operation, permissions and timestamps cannot be preserved 
+	# If doing reverse operation, permissions and timestamps cannot be preserved
 	# on Android device over MTP because of a bug in FUSE implementation,
 	# so we must use `-rl --size-only` instead of `-a` rsync option.
 	# Last tested on Android Marshmallow, and still not fixed.
