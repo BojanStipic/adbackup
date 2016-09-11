@@ -54,11 +54,11 @@ deviceInfo()
 printDevices()
 {
 	local ids idsIter i IFS
-	ids="$(find /run/user/$(id -u)/gvfs/ -maxdepth 1 -type d -name 'mtp:*')"
+	ids="$(find "/run/user/$(id -u)/gvfs/" -maxdepth 1 -type d -name 'mtp:*')"
 	i=0
 	IFS=$'\n'
 	if [[ "$ids" ]]; then
-		for idsIter in "$ids"; do
+		for idsIter in $ids; do
 			((++i))
 			echo "$i. $(deviceInfo $idsIter)"
 		done
@@ -122,7 +122,7 @@ fi
 skel="$(find $backupPath -type d -exec sh -c '(ls -p "{}"|grep />/dev/null)||echo "{}"' \;)"
 
 # Select working device
-devicePath="$(find /run/user/$(id -u)/gvfs/ -maxdepth 1 -type d -name 'mtp:*')"
+devicePath="$(find "/run/user/$(id -u)/gvfs/" -maxdepth 1 -type d -name 'mtp:*')"
 devicePathNum="$(echo $devicePath | wc -l | cut -d' ' -f1)"
 if [[ ! "$devicePath" ]]; then
 	echo "Error: No connected MTP device found."
