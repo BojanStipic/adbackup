@@ -145,7 +145,7 @@ deviceInfo "$devicePath"
 echo -e "\nBackup root directory:"
 echo "$backupPath"
 echo -e "\nLeaf directories found: "
-echo "${skel#$backupPath/}"
+echo "$skel" | sed "s/^$backupPath\///"
 echo
 test "$reverse" == true && echo "REVERSE BACKUP mode"
 echo -n "Continue? [Y/n] "
